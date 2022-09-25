@@ -16,7 +16,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class EncryptDecryptUtil {
 
-	private final String SECRET_KEY = "MicroservicePOC";
+	private final String SECRET_KEY = "MicroservicesPOC";
 	private final String ALGORITHM = "AES";
 	private final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
 

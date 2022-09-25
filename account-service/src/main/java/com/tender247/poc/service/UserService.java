@@ -21,6 +21,23 @@ public class UserService {
 
 	/**
 	 * 
+	 * @param userName
+	 * @return
+	 */
+	public UserDto userDetailsByUserName(String userName) {
+		if (!StringUtils.hasText(userName))
+			return null;
+
+		Users user = userRepository.findByUserName(userName);
+
+		if (null == user)
+			return null;
+
+		return convertUserToUserDto(user);
+	}
+	
+	/**
+	 * 
 	 * @param userId
 	 * @return
 	 */
@@ -61,5 +78,6 @@ public class UserService {
 		BeanUtils.copyProperties(User, dto);
 		return dto;
 	}
+
 
 }
