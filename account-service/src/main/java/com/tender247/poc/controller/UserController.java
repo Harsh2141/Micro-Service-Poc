@@ -55,7 +55,7 @@ public class UserController {
 	@GetMapping("/getallusers")
 	public ResponseEntity<?> getallusers() {
 		
-		List<UserDto> userDtos = userService.getallusers();
+		List<UserDto> userDtos = null;//userService.getallusers();
 		
 		if (null != userDtos)
 			return ResponseEntity.ok(userDtos);

@@ -30,7 +30,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		 //http.authorizeRequests().antMatchers("/api/me").permitAll();
 
 		// All other request are authenticated
-		http.authorizeRequests().anyRequest().authenticated();
+		//http.authorizeRequests().anyRequest().authenticated();
+		http.authorizeRequests().anyRequest().permitAll();
 		http.exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
 	}
 }

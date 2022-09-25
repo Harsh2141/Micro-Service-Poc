@@ -7,12 +7,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 //@EnableWebFluxSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -35,4 +38,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		//auth.inMemoryAuthentication().withUser("john").password(passwordEncoder().encode("pass")).roles("USER");
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 	}
+	
+//	@Bean
+//	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
+//		//serverHttpSecurity.csrf().disable().authorizeExchange(exchange -> exchange.anyExchange().authenticated())
+//			//	.oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::jwt);
+//		serverHttpSecurity.oauth2Login().
+//		return serverHttpSecurity.build();
+//	}
 }
