@@ -30,8 +30,8 @@ public class UserController {
 		return "Call from api gateway to account service using Open Feign successed...";
 	}
 	
-	@GetMapping("userDetailsByUserName/{username}")
-	public ResponseEntity<?> userDetailsByUserName(@PathVariable(name = "username", required = true) String userName) {
+	@GetMapping("userDetailsByUserName")
+	public ResponseEntity<?> userDetailsByUserName(@RequestParam(required = true) String userName) {
 		
 		UserDto userDto = userService.userDetailsByUserName(userName);
 		

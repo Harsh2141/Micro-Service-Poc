@@ -2,6 +2,7 @@ package com.tender247.poc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,5 +20,10 @@ public class GatewayController {
 	@GetMapping
 	public Mono<String> homeFeign() {
 		return accountClient.homeFeign();
+	}
+	
+	@GetMapping("/userDetailsByUserName/{userName}")
+	public Mono<?> userDetailsByUserName(@PathVariable(required = true) String userName){
+		return accountClient.userDetailsByUserName(userName);
 	}
 }
