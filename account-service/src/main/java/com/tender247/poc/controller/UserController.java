@@ -1,9 +1,13 @@
 package com.tender247.poc.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +25,17 @@ public class UserController {
 	private UserService userService;
 
 	@GetMapping
-	public String home() {
-		return "Call from api gateway to account service successed...";
+	public ResponseEntity<?> home(final OAuth2Authentication oAuth2Authentication) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		System.out.println(authentication.getCredentials());
+		System.out.println(authentication.getDetails());
+		System.out.println(authentication.getName());
+		System.out.println(authentication.getPrincipal());
+		System.out.println(authentication.getAuthorities());
+		if(null == oAuth2Authentication)
+			return ResponseEntity.ok("Call from api gateway to account service successed...");
+		else
+			return ResponseEntity.ok(oAuth2Authentication);
 	}
 
 	@GetMapping("/feign")
@@ -55,7 +68,7 @@ public class UserController {
 	@GetMapping("/getallusers")
 	public ResponseEntity<?> getallusers() {
 		
-		List<UserDto> userDtos = null;//userService.getallusers();
+		List<UserDto> userDtos = userService.getallusers();
 		
 		if (null != userDtos)
 			return ResponseEntity.ok(userDtos);

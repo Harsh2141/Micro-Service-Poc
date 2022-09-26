@@ -19,10 +19,7 @@
 		<spring-cloud.version>2021.0.3</spring-cloud.version>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-gateway</artifactId>
@@ -31,39 +28,16 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
-		<!-- <dependency> <groupId>org.springframework.cloud</groupId> <artifactId>spring-cloud-starter-openfeign</artifactId> 
-			</dependency> -->
-
-		<!-- For Open Feign, need to use reactive feign beacuse we use spring web 
-			flux in api gateway -->
-		<dependency>
-			<groupId>com.playtika.reactivefeign</groupId>
-			<artifactId>feign-reactor-spring-cloud-starter</artifactId>
-			<version>3.2.6</version>
-			<type>pom</type>
-		</dependency>
-
+		<!-- <dependency> <groupId>org.springframework.security.oauth.boot</groupId> 
+			<artifactId>spring-security-oauth2-autoconfigure</artifactId> </dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.springframework.security.oauth.boot/spring-security-oauth2-autoconfigure -->
-		<dependency>
-			<groupId>org.springframework.security.oauth.boot</groupId>
-			<artifactId>spring-security-oauth2-autoconfigure</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.1</version>
 		</dependency>
 
 		<dependency>
@@ -81,11 +55,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 

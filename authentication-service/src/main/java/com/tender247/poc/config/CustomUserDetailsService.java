@@ -1,9 +1,8 @@
 package com.tender247.poc.config;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
@@ -16,25 +15,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.tender247.poc.client.AccountClient;
 import com.tender247.poc.dto.UserDto;
+import com.tender247.poc.service.UserService;
 
 @Service(value = "userDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
 
 	@Autowired
-	private AccountClient accountClient;
+	private UserService userService;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		UserDto userDto = (UserDto) accountClient.userDetailsByUserName(username).block();
+		UserDto userDto = userService.userDetailsByUserName(username);
 
 		if (null == userDto)
 			throw new BadCredentialsException("Invalid Usename and Password");
 
-		User user = new User(userDto.getUserName(), userDto.getPassword(), userDto.isEnabled(), true, true, true,
-				getAuthorities(userDto.getRole()));
+		User user = new User(userDto.getUserName(), userDto.getPassword(), getAuthorities(userDto.getRole()));
 
 		// UserDetails instance whose status should be checked
 		new AccountStatusUserDetailsChecker().check(user);
@@ -42,29 +40,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 		return user;
 	}
 
-	/**
-	 * 
-	 * @param role
-	 * @return
-	 */
 	private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-		Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		authorities.add(new SimpleGrantedAuthority(role));
-		return authorities;
-	}
-
-	/**
-	 * 
-	 * @param roles
-	 * @return
-	 */
-	private Collection<? extends GrantedAuthority> getAuthorities(List<String> roles) {
-		Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-
-		roles.forEach(role -> {
-			authorities.add(new SimpleGrantedAuthority(role));
-		});
-
 		return authorities;
 	}
 

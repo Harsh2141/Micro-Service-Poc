@@ -5,23 +5,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
-//@EnableWebSecurity
-//@EnableWebFluxSecurity
+@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private UserDetailsService userDetailsService;
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -35,15 +32,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		//auth.inMemoryAuthentication().withUser("john").password(passwordEncoder().encode("pass")).roles("USER");
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 	}
-	
-//	@Bean
-//	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
-//		//serverHttpSecurity.csrf().disable().authorizeExchange(exchange -> exchange.anyExchange().authenticated())
-//			//	.oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::jwt);
-//		serverHttpSecurity.oauth2Login().
-//		return serverHttpSecurity.build();
-//	}
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.cors().and().csrf().disable();
+
+		http.authorizeRequests().anyRequest().authenticated().and().formLogin().permitAll().and().logout().permitAll();
+	}
 }
