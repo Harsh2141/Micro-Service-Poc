@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,67 +19,66 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tender247.poc.service.JwtProvider;
-import com.tender247.poc.service.UserService;
 
 import io.jsonwebtoken.Claims;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtConfiguration jwtConfig;
-    private JwtProvider tokenProvider;
-    
-    @Autowired
-    private UserDetailsService userDetailsService;
-    private String serviceUsername;
+	@Autowired
+	private JwtConfiguration jwtConfig;
 
-    public JwtAuthenticationFilter(
-            String serviceUsername,
-            JwtConfiguration jwtConfig,
-            JwtProvider tokenProvider) {
+	@Autowired
+	private JwtProvider tokenProvider;
 
-        this.serviceUsername = serviceUsername;
-        this.jwtConfig = jwtConfig;
-        this.tokenProvider = tokenProvider;
-    }
+	@Autowired
+	private UserDetailsService userDetailsService;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+	@Value("${security.service.username}")
+	private String serviceUsername;
 
-        String header = request.getHeader(jwtConfig.getHeader());
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
 
-        if (header == null || !header.startsWith(jwtConfig.getPrefix())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+		String header = request.getHeader(jwtConfig.getHeader());
 
-        String token = header.replace(jwtConfig.getPrefix(), "").trim();
+		if (header == null || !header.startsWith(jwtConfig.getPrefix())) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-        if (tokenProvider.validateJwtToken(token)) {
-            Claims claims = tokenProvider.getClaimsFromJwt(token);
-            String username = claims.getSubject();
-            UsernamePasswordAuthenticationToken authentication = null;
+		String token = header.replace(jwtConfig.getPrefix(), "").trim();
 
-            if (username.equals(serviceUsername)) {
-                List<String> authorities = (List<String>) claims.get("authorities");
-                authentication = new UsernamePasswordAuthenticationToken(username, null,
-                        authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
-            } else {
-            	UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+		if (tokenProvider.validateJwtToken(token)) {
+			Claims claims = tokenProvider.getClaimsFromJwt(token);
+			String username = claims.getSubject();
+			UsernamePasswordAuthenticationToken authentication = null;
+
+			if (username.equals(serviceUsername)) {
+				List<String> authorities = new ObjectMapper().convertValue(claims.get("authorities"),
+						new TypeReference<List<String>>() {
+						});
+				authentication = new UsernamePasswordAuthenticationToken(username, null,
+						authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+			} else {
+				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
 				if (null != userDetails) {
-					authentication = new UsernamePasswordAuthenticationToken(
-							userDetails, null, userDetails.getAuthorities());
+					authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+							userDetails.getAuthorities());
 					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				}
-            }
+			}
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
-            SecurityContextHolder.clearContext();
-        }
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+		} else {
+			SecurityContextHolder.clearContext();
+		}
 
-        filterChain.doFilter(request, response);
+		filterChain.doFilter(request, response);
 
-    }
+	}
 }

@@ -19,64 +19,49 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.tender247.poc.service.JwtProvider;
-import com.tender247.poc.service.UserService;
-
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-    private UserDetailsService userDetailsService;
+	private UserDetailsService userDetailsService;
 
-    @Autowired
-    private JwtConfiguration jwtConfig;
+	@Value("${security.service.username}")
+	private String serviceUsername;
 
-    @Autowired
-    private JwtProvider tokenProvider;
+	@Value("${security.service.password}")
+	private String servicePassword;
 
-    @Value("${security.service.username}")
-    private String serviceUsername;
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-    @Value("${security.service.password}")
-    private String servicePassword;
+		auth.inMemoryAuthentication().withUser(serviceUsername).password(passwordEncoder().encode(servicePassword))
+				.roles();
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 
-    	auth.inMemoryAuthentication()
-                .withUser(serviceUsername)
-                .password(passwordEncoder().encode(servicePassword))
-                .roles();
+	}
 
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.exceptionHandling()
+				.authenticationEntryPoint(
+						(request, response, e) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+				.and().addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+				.authorizeRequests().antMatchers(HttpMethod.POST, "/auth/login").permitAll()
+				.antMatchers(HttpMethod.POST, "/auth/users").anonymous().anyRequest().authenticated();
 
-    }
+	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .exceptionHandling().authenticationEntryPoint((request, response, e) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(serviceUsername, jwtConfig, tokenProvider), UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/auth/users").anonymous()
-                .anyRequest().authenticated();
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+	@Bean(BeanIds.AUTHENTICATION_MANAGER)
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
 }

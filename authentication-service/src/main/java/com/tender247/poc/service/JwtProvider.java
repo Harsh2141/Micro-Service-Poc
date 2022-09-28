@@ -1,6 +1,8 @@
 package com.tender247.poc.service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.tender247.poc.config.JwtConfiguration;
 
 import io.jsonwebtoken.Claims;
@@ -33,10 +38,18 @@ public class JwtProvider {
     public String generateToken(Authentication authentication) {
 
         Long now = System.currentTimeMillis();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("authorities", authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+        try {
+			claims.put("userData", new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(authentication.getPrincipal()));
+		} catch (JsonProcessingException e) {
+			
+		}
+        
         return Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim("authorities", authentication.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .addClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(now + jwtConfiguration.getExpiration() * 1000)) //in milliseconds
                 .signWith(Keys.hmacShaKeyFor(jwtConfiguration.getSecret().getBytes()))

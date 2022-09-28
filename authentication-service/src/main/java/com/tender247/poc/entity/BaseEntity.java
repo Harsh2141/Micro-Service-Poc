@@ -14,11 +14,9 @@ import org.springframework.util.ObjectUtils;
 import com.tender247.poc.util.EncryptDecryptUtil;
 
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
 
 @Data
 @MappedSuperclass
-@SuperBuilder(toBuilder = true)
 public class BaseEntity {
 
 	@Id
