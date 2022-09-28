@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 public class Users extends BaseEntity {
 
 	private String email;
-	private String userName;
+	private String username;
 	private String password;
 	private boolean enabled;
 	private String role;

@@ -14,7 +14,7 @@ import lombok.ToString;
 public class UserDto extends BaseDto {
 	
 	private String email;
-	private String userName;
+	private String username;
 	private String password;
 	private boolean enabled;
 	private String role;

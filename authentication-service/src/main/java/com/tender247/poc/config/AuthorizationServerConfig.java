@@ -46,6 +46,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
 		TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
 		tokenEnhancerChain.setTokenEnhancers(List.of(customTokenEnhancer(), accessTokenConverter()));
+		
 		endpoints.authenticationManager(authenticationManager).tokenEnhancer(tokenEnhancerChain)
 				.accessTokenConverter(accessTokenConverter()).tokenStore(tokenStore());
 	}
@@ -60,7 +61,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		clients.inMemory().withClient("client").secret(passwordEncoder.encode("secret"))
 				.authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit").scopes("read")
 				.resourceIds("account-resource", "gateway-resource").redirectUris("https://oauth.pstmn.io/v1/callback")
-				.accessTokenValiditySeconds(30000).refreshTokenValiditySeconds(40000);
+				.accessTokenValiditySeconds(300).refreshTokenValiditySeconds(400);
 	}
 
 	@Bean
@@ -68,6 +69,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public DefaultTokenServices tokenServices() {
 		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
 		defaultTokenServices.setTokenStore(tokenStore());
+		defaultTokenServices.setSupportRefreshToken(true);
 		return defaultTokenServices;
 	}
 

@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tender247.poc.dto.UserDto;
+import com.tender247.poc.entity.CustomUserDetails;
 import com.tender247.poc.service.UserService;
 
 @Service(value = "userDetailsService")
@@ -27,23 +28,21 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		UserDto userDto = userService.userDetailsByUserName(username);
+		CustomUserDetails userDto = userService.userDetailsByUserName(username);
 
 		if (null == userDto)
 			throw new BadCredentialsException("Invalid Usename and Password");
 
-		User user = new User(userDto.getUserName(), userDto.getPassword(), getAuthorities(userDto.getRole()));
-
 		// UserDetails instance whose status should be checked
-		new AccountStatusUserDetailsChecker().check(user);
+		new AccountStatusUserDetailsChecker().check(userDto);
 
-		return user;
+		return userDto;
 	}
 
-	private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(role));
-		return authorities;
-	}
+//	private Collection<? extends GrantedAuthority> getAuthorities(String role) {
+//		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+//		authorities.add(new SimpleGrantedAuthority(role));
+//		return authorities;
+//	}
 
 }
