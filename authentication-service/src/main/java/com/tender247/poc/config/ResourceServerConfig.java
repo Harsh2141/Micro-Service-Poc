@@ -37,7 +37,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		http.requestMatchers().and().authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/oauth/token")
 				.permitAll()
-				.antMatchers("/", "/oauth/authorize**", "/login**", "/error**", "/api/user/getallusers").permitAll();
+				.antMatchers("/", "/oauth/authorize**", "/login**", "/error**", "/api/user/getallusers").permitAll()
+				.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/openapi/**").permitAll();
 
 		 //http.authorizeRequests().antMatchers("/api/me").permitAll();
 

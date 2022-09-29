@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +16,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.tender247.poc.dto.UserDto;
 import com.tender247.poc.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("api/user")
@@ -33,6 +34,7 @@ public class UserController {
 	 * @return
 	 */
 	@GetMapping("/userInfoFromToken")
+	@Operation(summary = "userInfoFromToken", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<?> home(final OAuth2Authentication oAuth2Authentication) {
 		if (null == oAuth2Authentication)
 			return ResponseEntity.ok("Call from api gateway to account service successed...");
@@ -66,6 +68,7 @@ public class UserController {
 	 * @return
 	 */
 	@GetMapping("/userDetails/{userId}")
+	@Operation(summary = "userDetails by userID", security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<?> userDetails(@PathVariable String userId) {
 
 		UserDto userDto = userService.userDetailsByUserId(userId);
