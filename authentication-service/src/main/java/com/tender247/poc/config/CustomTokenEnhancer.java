@@ -2,10 +2,8 @@ package com.tender247.poc.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -26,7 +24,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
 		try {
 			UserDto user = new UserDto();
 			BeanUtils.copyProperties((CustomUserDetails) authentication.getPrincipal(), user);
-			
+			user.setPassword(null);
 			additionalInfo.put("user_data", new ObjectMapper().registerModule(new JavaTimeModule())
 					.writeValueAsString(user));
 		} catch (JsonProcessingException e) {

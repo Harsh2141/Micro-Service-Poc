@@ -10,6 +10,7 @@ import lombok.Data;
 public class SecurityProperties {
 
 	private JwtProperties jwt;
+	private Client client;
 
 	@Data
 	public static class JwtProperties {
@@ -17,6 +18,18 @@ public class SecurityProperties {
 		private String keyStorePassword;
 		private String keyAlias;
 		private String keyPassword;
+	}
+	
+	@Data
+	public static class Client{
+		private String clientId;
+		private String secret;
+		private String[] scopes;
+		private String[] resourceIds;
+		private String[] authorizationGrantTypes;
+		private String[] redirectUris;
+		private Integer accessTokenValidity;
+		private Integer refreshTokenValidity;
 	}
 
 }

@@ -21,6 +21,17 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	@Autowired
     private ResourceServerTokenServices tokenServices;
 	
+	public static final String[] PERMITTED_SWAGGER_URL = {
+			"/openapi/**",
+			"/swagger-resources",
+			"/swagger-resources/**", 
+			"/configuration/ui", 
+			"/configuration/security", 
+			"/swagger-ui.html", 
+			"/webjars/**",
+			"/v3/api-docs/**", "/swagger-ui/**" 
+			};
+	
 	@Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
         resources.resourceId("account-resource").tokenServices(tokenServices);
@@ -37,8 +48,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		http.requestMatchers().and().authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/oauth/token")
 				.permitAll()
-				.antMatchers("/", "/oauth/authorize**", "/login**", "/error**", "/api/user/getallusers").permitAll()
-				.antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/openapi/**").permitAll();
+				.antMatchers("/", "/oauth/authorize/**", "/login**", "/error**", "/api/user/getallusers").permitAll()
+				.antMatchers(PERMITTED_SWAGGER_URL).permitAll();
 
 		 //http.authorizeRequests().antMatchers("/api/me").permitAll();
 
